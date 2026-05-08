@@ -1,4 +1,24 @@
 #include <iostream>
+class Vector3d; // forward declaration of class Vector3d
+class Point3d
+{
+private:
+	double m_x{};
+	double m_y{};
+	double m_z{};
+
+public:
+	Point3d(double x, double y, double z)
+		: m_x{x}, m_y{y}, m_z{z}
+	{ }
+
+	void print() const
+	{
+		std::cout << "Point(" << m_x << ", " << m_y << ", " << m_z << ")\n";
+	}
+    
+    void moveByVector(const Vector3d& v); // declaration of member function that takes a Vector3d as parameter
+};
 
 class Vector3d
 {
@@ -18,34 +38,17 @@ public:
 		std::cout << "Vector(" << m_x << ", " << m_y << ", " << m_z << ")\n";
 	}
 
-    friend class Point3d;
+    friend void Point3d::moveByVector(const Vector3d& v);
 };
 
-class Point3d
+void Point3d::moveByVector(const Vector3d& v)
 {
-private:
-	double m_x{};
-	double m_y{};
-	double m_z{};
+    // implement this function as a friend of class Vector3d
+    m_x += v.m_x;
+    m_y += v.m_y;
+    m_z += v.m_z;
+}
 
-public:
-	Point3d(double x, double y, double z)
-		: m_x{x}, m_y{y}, m_z{z}
-	{ }
-
-	void print() const
-	{
-		std::cout << "Point(" << m_x << ", " << m_y << ", " << m_z << ")\n";
-	}
-
-	void moveByVector(const Vector3d& v)
-	{
-		// implement this function as a friend of class Vector3d
-        m_x += v.m_x;
-        m_y += v.m_y;
-        m_z += v.m_z;
-	}
-};
 
 int main()
 {
