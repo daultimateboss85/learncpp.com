@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include "Random.h"
 
 class Monster
 {
@@ -66,13 +67,57 @@ private:
     int m_hitPoints {};
 };
 
+
+namespace MonsterGenerator
+{
+
+    std::string_view getName(int name);
+    std::string_view getRoar(int roar);
+
+    Monster generate()
+    {
+        return Monster{
+
+            static_cast<Monster::Type>(Random::get(0,8)), 
+            getName(Random::get(0,5)),
+            getRoar(Random::get(0,5)),
+            Random::get(1,100)};
+    }
+
+    std::string_view getRoar(int roar)
+    {
+        switch (roar)
+        {
+        case 0: return "oink";
+        case 1: return "bask";
+        case 2: return "talk";
+        case 3: return "bark";
+        case 4: return "woof";
+        case 5: return "screech";
+        default: return "roar";
+           
+        }
+    }
+
+    std::string_view getName(int name)
+    {
+        switch (name)
+        {
+            case 0: return "zabimaru";
+            case 1: return "zenbonzakura";
+            case 2: return "chad";
+            case 3: return "bankai";
+            case 4: return "hollow";
+            case 5: return "zanpakto";
+            default: return "ichigo";
+        }
+    }
+};
+
 int main()
 {
-	Monster skeleton{ Monster::skeleton, "Bones", "*rattle*", 4 };
-	skeleton.print();
-
-	Monster vampire{ Monster::vampire, "Nibblez", "*hiss*", 0 };
-	vampire.print();
+	Monster m{ MonsterGenerator::generate() };
+	m.print();
 
 	return 0;
 }
