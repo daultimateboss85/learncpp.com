@@ -2,6 +2,22 @@
 #include <vector>
 #include <string>
 #include <string_view>
+
+template <typename T>
+bool isValueInArray(const std::vector<T>& arr, const T& value)
+{
+    for (const auto& element: arr)
+    {
+        if (element==value)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 int main()
 {
     std::vector<std::string_view>names{"Alex", "Betty", "Caroline", "Dave", "Emily", "Fred", "Greg","Holly"};
@@ -13,14 +29,7 @@ int main()
 
     bool found{false};
 
-    for(std::string_view arrName: names)
-    {
-        if (name==arrName)
-        {
-            found = true;
-            break;
-        }
-    }
+    found = isValueInArray<std::string_view>(names, name);
 
     std::cout << name;
     if (found) std::cout << " was found\n";
