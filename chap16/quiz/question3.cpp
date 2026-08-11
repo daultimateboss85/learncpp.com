@@ -38,25 +38,25 @@ std::pair<int, int> vecToPair(const std::vector<T>& vector)
 
     return std::pair(min_index, max_index);
 }
+
 template<typename T>
 void printArray(const std::vector<T>& arr)
 {
-    std::cout << "( ";
+    std::cout << "With array ( ";
+
     for (auto item: arr)
     {
         std::cout << item << ", ";
     }
 
-    std::cout << ")";
+    std::cout << ")\n";
 }
 
 template<typename T>
 void printAnswer(const std::vector<T>& vector)
 {
     std::pair minMax{vecToPair(vector)};
-    std::cout << "With array ";
-    printArray(vector);
-    std::cout << ":\n";
+    
     std::cout <<"The min element has index " <<std::get<0>(minMax) << " and value " 
     << vector[toUZ(std::get<0>(minMax))] << "\n";
     std::cout <<"The max element has index " <<std::get<1>(minMax) << " and value " 
@@ -65,11 +65,52 @@ void printAnswer(const std::vector<T>& vector)
     std::cout << "\n";
 }
 
+/*we want to accept user input
+
+
+*/
+
+bool fillVecWithInput(std::vector<int>& arr)
+{
+    bool first{true};
+    int curr_number{};
+
+    while (true)
+    {
+        std::cin >> curr_number;
+        if (curr_number==-1)
+        {
+            if (first)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            arr.push_back(curr_number);
+            first = false;
+        }
+    }
+}
+
 int main()
 {
-    std::vector v1 { 3, 8, 2, 5, 7, 8, 3 };
-    std::vector v2 { 5.5, 2.7, 3.3, 7.6, 1.2, 8.8, 6.6 };   
+    std::vector<int> numbers{};
+    std::cout << "Enter numbers to add (use -1 to stop): ";
+    bool acceptInput{ fillVecWithInput(numbers)};
 
-    printAnswer(v1);
-    printAnswer(v2);
+    if (acceptInput)
+    {
+        printArray(numbers);
+        printAnswer(numbers);
+    }
+    else
+    {
+        std::cout << "Enter better";
+    }
+
 }
