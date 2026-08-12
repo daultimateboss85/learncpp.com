@@ -5,60 +5,21 @@
 
 namespace WordList
 {
-    enum Words
-    {
-        mystery,
-        broccoli, 
-        account, 
-        almost, 
-        spaghetti, 
-        opinion,
-        beautiful, 
-        distance, 
-        luggage,
-        count,
-    };
+    // Define your list of words here
+    std::vector<std::string_view> words { "mystery", "broccoli" , "account", "almost", "spaghetti", "opinion", "beautiful", "distance", "luggage" };
 
-    Words pickRandomWord()
+    std::string_view getRandomWord()
     {
-        return static_cast<Words>(Random::get(0,Words::count-1));
+        return words[Random::get<std::size_t>(0, words.size()-1)];
     }
-
-    std::string_view getStringWord(Words word)
-    {
-        switch (word)
-        {
-            case mystery: return "mystery";
-            case broccoli: return "broccoli";
-            case account: return "account";
-            case almost: return "almost";
-            case spaghetti: return "spaghetti";
-            case opinion: return "opinion";
-            case beautiful: return "beautiful";
-            case distance: return "distance";
-            case luggage: return "luggage";
-            default: return "error";
-        }
-    }
-
-    void printWord(Words word)
-    {
-        std::cout << getStringWord(word);
-    }
-    
-}
-
-void printWelcome()
-{
-    std::cout << "Welcome to C++man (a variant of Hangman)\n";
-    std::cout << "To win: guess the word. To lose: run out of pluses.\n\n";
 }
 
 int main()
 {
-    printWelcome();
-    WordList::Words word{WordList::pickRandomWord()};
+    std::cout << "Welcome to C++man (a variant of Hangman)\n";
+    std::cout << "To win: guess the word.  To lose: run out of pluses.\n";
 
-    std::cout << "The word is: " << WordList::getStringWord(word) << "\n";
+    std::cout << "The word is: " << WordList::getRandomWord();
 
+    return 0;
 }
