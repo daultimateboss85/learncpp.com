@@ -20,8 +20,19 @@ class Session
 {
 private:
     std::string_view word{};
+    std::vector<char> guessedLetters {};
 
 public:
+    std::string_view getWord() const{ return word;}
+
+    const std::vector<char>& getguessedLetters()  const
+    {return guessedLetters;}
+
+    void addGuess(char guess)
+    {
+        guessedLetters.push_back(guess);
+    }
+
     Session()
         : word{WordList::getRandomWord()}
     {
@@ -29,48 +40,92 @@ public:
         std::cout << "To win: guess the word.  To lose: run out of pluses.\n";
     }
 
-    void displayState()
-    {
-        std::cout << "The word: " << std::string(word.size(), '-') << "\n";
-    }
+    
+};
 
-    bool acceptLetter()
-    {
-        char letter{};
+char acceptLetter( Session& s)
+{
+    char letter{};
 
-        while (true)
+    while (true)
+    {
+        std::cout << "Enter your next letter: ";
+        std::cin >> letter;
+        if(!std::cin)
         {
-            std::cout << "Enter your next letter: ";
-            std::cin >> letter;
-            while (!std::cin)
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "That wasnt a valid input. Try again.\n";
-                continue;
-            }
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "That wasnt a valid input. Try again.\n";
+            continue;
+        }
+        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-            if (!(std::isalpha(letter)))
+        bool already_guessed{false};
+        for (auto guess: s.getguessedLetters())
+        {
+            if (letter== guess)
             {
-                std::cout << "That wasnt a valid input. Try again.\n";
-                continue;
-            }
-            else
-            {
-                std::cout << "You entered: " << letter << "\n";
-                return true;
+                already_guessed = true;
+                break;
             }
         }
 
-        return true;
+        if (already_guessed)
+        {
+            std::cout << "You already guess that. Try again.\n";
+            continue;
+        }
+
+        if (!(std::isalpha(letter)))
+        {
+            std::cout << "That wasnt a valid input. Try again.\n";
+            continue;
+        }
+        else
+        {
+            std::cout << "You entered: " << letter << "\n";
+            s.addGuess(letter);
+            return letter;
+        }
     }
-};
+
+    
+}
+void draw(const Session& s)
+{
+    std::cout << '\n';
+
+    std::cout << "The word: ";
+    for ([[maybe_unused]] auto c: s.getWord()) // step through each letter of word
+    {
+        bool found{false};
+
+        for (auto letter: s.getguessedLetters())
+        {
+            if (c == letter)
+            {
+                std::cout << c;
+                found = true;
+                break;
+            }
+        }
+        if (!found){std::cout << '_';}
+    }
+
+    std::cout << '\n';
+}
 
 int main()
 {
 
     Session session{};
-    session.displayState();
-    session.acceptLetter();
+
+    for (int i=0; i < 6; i++)
+    {
+        draw(session);
+        char guess{acceptLetter(session)};
+    }
+    
     return 0;
 }
