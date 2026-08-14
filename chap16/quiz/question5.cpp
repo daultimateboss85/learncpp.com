@@ -8,7 +8,7 @@
 namespace WordList
 {
     // Define your list of words here
-    std::vector<std::string_view> words{"mystery", "broccoli", "account", "almost", "spaghetti", "opinion", "beautiful", "distance", "luggage"};
+    std::vector<std::string_view> words{ "distance", "luggage"};
 
     std::string_view getRandomWord()
     {
@@ -20,17 +20,42 @@ class Session
 {
 private:
     std::string_view word{};
-    std::vector<char> guessedLetters {};
+    std::vector<bool> guessedLetters {std::vector<bool>(26)};
+    std::vector<char> incorrectGuesses{};
+    int pluses {6};
 
 public:
     std::string_view getWord() const{ return word;}
 
-    const std::vector<char>& getguessedLetters()  const
-    {return guessedLetters;}
+    // const std::vector<bool>& getguessedLetters() const  
+    // {return guessedLetters;}
+    const std::vector<char>& getIncorrectlyGuessed() const
+    {
+        return incorrectGuesses;
+    }
+    bool ifGuessed(char letter) const{return guessedLetters[static_cast<std::size_t>((letter % 32)-1)];}
+
+    bool isInWord(char letter)
+    {
+        for (auto c: word)
+        {
+            if(c == letter)
+            {return true;}
+        }
+        return false;
+    }
+    void usePlus(){pluses -=1;}
+    bool plusRemains() const {return pluses >0;}
+    int getPlus() const {return pluses;}
 
     void addGuess(char guess)
     {
-        guessedLetters.push_back(guess);
+        guessedLetters[static_cast<std::size_t>((guess % 32)-1)] = true;
+    }
+
+    void addIncorrectGuess(char letter)
+    {
+        incorrectGuesses.push_back(letter);
     }
 
     Session()
@@ -42,6 +67,47 @@ public:
 
     
 };
+
+void updateState( Session& s, char letter)
+{
+    s.addGuess(letter);
+
+    if (s.isInWord(letter))
+    {
+        std::cout << "Yes, " << letter << " is in the word!";
+    }
+    else
+    {
+        std::cout << "No, " << letter << " is not in the word!";
+        s.usePlus();
+        s.addIncorrectGuess(letter);
+    }
+}
+bool isGameOver(const Session& s)
+{
+    if (!s.plusRemains())
+    {
+        return true;
+    }
+
+    for (auto c: s.getWord())
+    {
+        if (!s.ifGuessed(c))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isWon(const Session& s)
+{
+    if (!s.plusRemains())
+    {
+        return false;
+    }
+    return true;
+}
 
 char acceptLetter( Session& s)
 {
@@ -61,17 +127,9 @@ char acceptLetter( Session& s)
         
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        bool already_guessed{false};
-        for (auto guess: s.getguessedLetters())
-        {
-            if (letter== guess)
-            {
-                already_guessed = true;
-                break;
-            }
-        }
+        
 
-        if (already_guessed)
+        if (s.ifGuessed(letter))
         {
             std::cout << "You already guess that. Try again.\n";
             continue;
@@ -84,8 +142,6 @@ char acceptLetter( Session& s)
         }
         else
         {
-            std::cout << "You entered: " << letter << "\n";
-            s.addGuess(letter);
             return letter;
         }
     }
@@ -99,32 +155,53 @@ void draw(const Session& s)
     std::cout << "The word: ";
     for ([[maybe_unused]] auto c: s.getWord()) // step through each letter of word
     {
-        bool found{false};
-
-        for (auto letter: s.getguessedLetters())
+       
+        if (s.ifGuessed(c))
         {
-            if (c == letter)
-            {
-                std::cout << c;
-                found = true;
-                break;
-            }
+            std::cout << c;
         }
-        if (!found){std::cout << '_';}
+        else
+        {
+            std::cout << '_';
+
+        }
+    }
+    
+        std::cout << "\tWrong guesses: ";
+        std::cout << std::string( s.getPlus(), '+');
+        for (auto c: s.getIncorrectlyGuessed())
+        {
+            std::cout << c;
+        }
+
+        std::cout << "\n";
     }
 
-    std::cout << '\n';
-}
+
+
 
 int main()
 {
 
     Session session{};
 
-    for (int i=0; i < 6; i++)
+    while(true)
     {
         draw(session);
+        if (isGameOver(session))
+        {
+            if (isWon(session))
+            {
+                std::cout << "You won! The word was: " << session.getWord();
+            }
+            else
+            {
+                std::cout << "You lost! The word was: " << session.getWord();
+            }
+            break;
+        };
         char guess{acceptLetter(session)};
+        updateState(session, guess);
     }
     
     return 0;
