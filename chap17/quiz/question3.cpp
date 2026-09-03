@@ -82,7 +82,6 @@ public:
             }
         }
 
-        std::cout << m_cards.size() << "\n";
     }
 
     Card dealCard()
@@ -99,14 +98,44 @@ public:
     }
 };
 
+struct Player
+{
+    int score{};
+};
 
+
+
+
+
+bool blackjack()
+{
+//shuffle deck, 
+//pick first two for player, next for dealer
+    Deck deck{};
+    deck.shuffle();
+
+    Player dealer{};
+    Player player{};
+    
+    player.score += (deck.dealCard().getValue());
+    player.score += (deck.dealCard().getValue());
+    dealer.score += (deck.dealCard().getValue());
+
+    std::cout << "The dealer is showing: " << dealer.score << "\n"; 
+    std::cout << "You have score: " << player.score << "\n"; 
+    
+    return (player.score > dealer.score);   
+}
 int main()
 {
-    Deck deck{};
-    std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' ' << deck.dealCard() << '\n';
-
-    deck.shuffle();
-    std::cout << deck.dealCard() << ' ' << deck.dealCard() << ' ' << deck.dealCard() << '\n';
-
-    return 0;
+ 
+    if(blackjack())
+    {
+        std::cout << "You win\n";
+    }
+    else 
+    {
+        std::cout << "You lose \n";
+    }
+    
 }
