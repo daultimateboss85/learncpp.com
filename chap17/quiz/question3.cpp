@@ -104,7 +104,11 @@ struct Player
 };
 
 
-
+namespace Settings
+{
+    constexpr int bust_Value {21};
+    constexpr int dealer_stop_value{17};
+}
 
 
 bool blackjack()
@@ -124,6 +128,20 @@ bool blackjack()
     std::cout << "The dealer is showing: " << dealer.score << "\n"; 
     std::cout << "You have score: " << player.score << "\n"; 
     
+    while (dealer.score < Settings::dealer_stop_value)
+    {
+        Card dealer_card{deck.dealCard()};
+
+        std::cout << "The dealer flips a " << dealer_card << "\n";
+
+        dealer.score += dealer_card.getValue();
+        
+        if (dealer.score > Settings::bust_Value)
+        {
+            return true;
+        } 
+    }
+
     return (player.score > dealer.score);   
 }
 int main()
