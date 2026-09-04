@@ -1,5 +1,7 @@
+#include <ios>
 #include <iostream>
 #include <array>
+#include <limits>
 #include <vector>
 #include <algorithm>
 #include "..\..\headers\Random.h"
@@ -110,6 +112,89 @@ namespace Settings
     constexpr int dealer_stop_value{17};
 }
 
+bool dealerTurn(Player& dealer, Deck& deck)
+{
+    while (dealer.score < Settings::dealer_stop_value)
+    {
+        Card dealer_card{deck.dealCard()};
+
+        dealer.score += dealer_card.getValue();
+
+        std::cout << "The dealer flips a " << dealer_card << ". They now have: " << dealer.score << "\n";
+
+        if (dealer.score > Settings::bust_Value)
+        {
+            return true;
+        } 
+    }
+    return false;
+};
+
+char getInput()
+{   
+    char input{};
+    while (true)
+    {
+        std::cout << "(h) to hit, or (s) to stand: ";
+        std::cin >> input;
+
+        if (!std::cin)
+        {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Bad input. Try again: \n";
+            continue;
+        }
+
+        if (!std::cin.eof() && std::cin.peek()!='\n')
+        {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Too much input. Try again: \n";
+            continue;
+        }
+
+        if (input != 's' && input != 'h')
+        {
+            std::cout << "Choose appropriately. Try again\n: ";
+            continue;
+        }
+
+        return input;
+    }
+}
+bool playerTurn (Player& player, Deck & deck)
+{
+    //returns true if player busts false otherwise or if stands
+    while (player.score < Settings::bust_Value)
+    {
+        char option {getInput()};
+
+        if (option=='h')
+        {
+            Card card {deck.dealCard()};
+            player.score += card.getValue();
+            std::cout << "You were dealt " << card << ". You now have: " << player.score << "\n";
+
+            if (player.score > Settings::bust_Value)
+            {
+                return true;
+            }
+        }
+        else 
+        {
+            return false;
+        }
+    }
+    if(player.score > Settings::bust_Value)
+    {
+        return true;
+    }
+    else 
+    {
+        return false; //he didnt bust
+    }
+    
+};
 
 bool blackjack()
 {
@@ -127,19 +212,13 @@ bool blackjack()
 
     std::cout << "The dealer is showing: " << dealer.score << "\n"; 
     std::cout << "You have score: " << player.score << "\n"; 
-    
-    while (dealer.score < Settings::dealer_stop_value)
+    if (playerTurn(player,deck))
     {
-        Card dealer_card{deck.dealCard()};
-
-        std::cout << "The dealer flips a " << dealer_card << "\n";
-
-        dealer.score += dealer_card.getValue();
-        
-        if (dealer.score > Settings::bust_Value)
-        {
-            return true;
-        } 
+        return false; 
+    }
+    if(dealerTurn(dealer,deck))
+    {
+        return true;
     }
 
     return (player.score > dealer.score);   
