@@ -128,6 +128,32 @@ namespace Settings
     constexpr int dealer_stop_value{17};
 }
 
+void addCard(Player& player, Card& card)
+{
+    /*
+    if card is an ace we increment player ace counter
+    we add card score to player score
+
+    if player busts check number of aces left and if greater than 1 we decrease score by 10 and reduce ace count
+    */
+    if (card.rank == Card::rank_ace)
+    {
+        player.aces++;
+    }
+
+    player.score += card.getValue();
+
+    if (player.score > Settings::bust_Value)
+    {
+        if(player.aces > 1)
+        {
+            player.score -= 10;
+            player.aces--;
+        }
+    }
+}
+
+
 bool dealerTurn(Player& dealer, Deck& deck)
 {
     while (dealer.score < Settings::dealer_stop_value)
@@ -222,13 +248,17 @@ gameOverState blackjack()
     Player dealer{};
     Player player{};
     
-    player.score += (deck.dealCard().getValue());
-    player.score += (deck.dealCard().getValue());
-    dealer.score += (deck.dealCard().getValue());
+    Card playercard1 = deck.dealCard();
+    Card playercard2 = deck.dealCard();
+    Card dealercard = deck.dealCard();
 
-    std::cout << "The dealer is showing: " << dealer.score << "\n"; 
+    player.score += (playercard1.getValue());
+    player.score += (playercard2.getValue());
+    dealer.score += (dealercard.getValue());
 
-    std::cout << "You have score: " << player.score << "\n"; 
+    std::cout << "The dealer is showing: " << dealercard << " (" << dealer.score << ")\n"; 
+
+    std::cout << "You are showing: "<< playercard1 <<  " " << playercard2  << " (" << player.score << ")\n"; 
 
     if (playerTurn(player,deck))
     {
