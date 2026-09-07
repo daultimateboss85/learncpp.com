@@ -128,49 +128,10 @@ namespace Settings
     constexpr int dealer_stop_value{17};
 }
 
-void addCard(Player& player, Card& card)
-{
-    /*
-    if card is an ace we increment player ace counter
-    we add card score to player score
-
-    if player busts check number of aces left and if greater than 1 we decrease score by 10 and reduce ace count
-    */
-    if (card.rank == Card::rank_ace)
-    {
-        player.aces++;
-    }
-
-    player.score += card.getValue();
-
-    if (player.score > Settings::bust_Value)
-    {
-        if(player.aces > 1)
-        {
-            player.score -= 10;
-            player.aces--;
-        }
-    }
-}
 
 
-bool dealerTurn(Player& dealer, Deck& deck)
-{
-    while (dealer.score < Settings::dealer_stop_value)
-    {
-        Card dealer_card{deck.dealCard()};
 
-        dealer.score += dealer_card.getValue();
 
-        std::cout << "The dealer flips a " << dealer_card << ". They now have: " << dealer.score << "\n";
-
-        if (dealer.score > Settings::bust_Value)
-        {
-            return true;
-        } 
-    }
-    return false;
-};
 
 char getInput()
 {   
@@ -204,6 +165,52 @@ char getInput()
         return input;
     }
 }
+
+void addCard(Player& player, Card& card)
+{
+    /*
+    if card is an ace we increment player ace counter
+    we add card score to player score
+
+    if player busts check number of aces left and if greater than 1 we decrease score by 10 and reduce ace count
+    */
+    if (card.rank == Card::rank_ace)
+    {
+        player.aces++;
+        
+    }
+
+    player.score += card.getValue();
+
+    if (player.score > Settings::bust_Value)
+    {
+        
+        if(player.aces > 0)
+        {
+            player.score -= 10;
+            player.aces--;
+        }
+    }
+}
+
+bool dealerTurn(Player& dealer, Deck& deck)
+{
+    while (dealer.score < Settings::dealer_stop_value)
+    {
+        Card dealer_card{deck.dealCard()};
+
+        addCard(dealer, dealer_card);
+
+        std::cout << "The dealer flips a " << dealer_card << ". They now have: " << dealer.score << "\n";
+
+        if (dealer.score > Settings::bust_Value)
+        {
+            return true;
+        } 
+    }
+    return false;
+};
+
 bool playerTurn (Player& player, Deck & deck)
 {
     //returns true if player busts false otherwise or if stands
@@ -214,7 +221,9 @@ bool playerTurn (Player& player, Deck & deck)
         if (option=='h')
         {
             Card card {deck.dealCard()};
-            player.score += card.getValue();
+            //player.score += card.getValue();
+
+            addCard(player, card);
             std::cout << "You were dealt " << card << ". You now have: " << player.score << "\n";
 
             if (player.score > Settings::bust_Value)
@@ -252,9 +261,9 @@ gameOverState blackjack()
     Card playercard2 = deck.dealCard();
     Card dealercard = deck.dealCard();
 
-    player.score += (playercard1.getValue());
-    player.score += (playercard2.getValue());
-    dealer.score += (dealercard.getValue());
+    addCard(player, playercard1);
+    addCard(player, playercard2);
+    addCard(dealer, dealercard);
 
     std::cout << "The dealer is showing: " << dealercard << " (" << dealer.score << ")\n"; 
 
